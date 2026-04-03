@@ -11,7 +11,7 @@ Pure Python stdlib — zero pip installs.
 import http.server, json, sqlite3, os, urllib.parse
 from datetime import datetime
 
-PORT     = 8000
+PORT     = int(os.environ.get("PORT", 8000))
 DB_PATH  = os.path.join(os.path.dirname(__file__), "interniq.db")
 FRONTEND = os.path.join(os.path.dirname(__file__), "..", "frontend", "public")
 
