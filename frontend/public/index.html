@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InternIQ — AI Internship Readiness Score Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e28;
+  --b:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);
+  --tx:#f0eff8;--mu:#8886a0;--mu2:#5a5870;
+  --ac:#7c5cfc;--ac2:#c084fc;
+  --gn:#22d3a0;--am:#f59e0b;--pk:#ec4899;--bl:#60a5fa;--rd:#f87171;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 48px;background:rgba(10,10,15,.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--b)}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;cursor:pointer}
+.logo em{color:var(--ac);font-style:normal}
+.nav-links{display:flex;gap:26px}
+.nav-links a{color:var(--mu);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s;cursor:pointer}
+.nav-links a:hover{color:var(--tx)}
+.nav-cta{background:var(--ac);color:#fff;padding:8px 20px;border-radius:100px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:opacity .2s}
+.nav-cta:hover{opacity:.85}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 48px 80px;text-align:center;position:relative;overflow:hidden}
+.glow{position:absolute;border-radius:50%;pointer-events:none}
+.g1{width:800px;height:800px;background:radial-gradient(circle,rgba(124,92,252,.17)0%,transparent 68%);top:-200px;left:50%;transform:translateX(-50%)}
+.g2{width:500px;height:500px;background:radial-gradient(circle,rgba(236,72,153,.09)0%,transparent 70%);bottom:-100px;right:0}
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.hbadge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,92,252,.12);border:1px solid rgba(124,92,252,.28);padding:5px 16px;border-radius:100px;font-size:12px;font-weight:600;color:var(--ac2);margin-bottom:26px;animation:up .7s ease both;letter-spacing:.3px}
+.dot{width:7px;height:7px;background:var(--ac);border-radius:50%;animation:pulse 1.4s infinite}
+h1{font-family:'Syne',sans-serif;font-size:clamp(30px,5.5vw,68px);font-weight:800;line-height:1.0;letter-spacing:-2px;max-width:820px;animation:up .7s .1s ease both}
+.grad{background:linear-gradient(135deg,var(--ac)0%,var(--ac2)45%,var(--pk)100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hsub{margin-top:18px;font-size:16px;color:var(--mu);max-width:500px;animation:up .7s .2s ease both;line-height:1.7}
+.hbtns{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:up .7s .3s ease both}
+.btn-p{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;padding:12px 30px;border-radius:100px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 0 26px rgba(124,92,252,.34)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,92,252,.44)}
+.btn-o{background:transparent;border:1px solid var(--b2);color:var(--tx);padding:12px 24px;border-radius:100px;font-size:15px;cursor:pointer;transition:background .2s}
+.btn-o:hover{background:rgba(255,255,255,.05)}
+
+/* STATS */
+.statsbar{padding:22px 48px;border-top:1px solid var(--b);border-bottom:1px solid var(--b);background:var(--bg2);display:flex;justify-content:center;gap:60px;flex-wrap:wrap}
+.stn{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ac2);text-align:center}
+.stl{font-size:11px;color:var(--mu);margin-top:1px;text-align:center}
+
+/* LAYOUT */
+.wrap{padding:76px 48px;max-width:1200px;margin:0 auto}
+.stag{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-bottom:10px}
+.stitle{font-family:'Syne',sans-serif;font-size:clamp(22px,3.2vw,38px);font-weight:800;letter-spacing:-1px;line-height:1.1}
+.ssub{color:var(--mu);font-size:14px;margin-top:10px;max-width:480px;line-height:1.7}
+.div{height:1px;background:var(--b);max-width:1200px;margin:0 auto}
+
+/* ═══ 3 MODE SELECTOR ═══ */
+.mode-section{margin-top:16px}
+.mode-heading{font-size:14px;font-weight:600;color:var(--mu);margin-bottom:18px;text-align:center}
+
+.mode-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.mode-card{background:var(--bg2);border:2px solid var(--b);border-radius:20px;padding:28px 22px;cursor:pointer;transition:all .25s;text-align:center;position:relative;overflow:hidden}
+.mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .25s}
+.mode-card:hover{border-color:var(--b2);transform:translateY(-3px)}
+.mode-card.active{border-color:var(--ac);background:rgba(124,92,252,.08)}
+.mode-card.active::before{opacity:1}
+.mc-manual::before{background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.mc-github::before{background:linear-gradient(90deg,#24292e,#6e7681)}
+.mc-resume::before{background:linear-gradient(90deg,var(--gn),#059669)}
+.mc-icon{font-size:36px;margin-bottom:12px;display:block}
+.mc-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:6px}
+.mc-desc{font-size:12px;color:var(--mu);line-height:1.6}
+.mc-tags{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}
+.mc-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px;background:var(--bg3);color:var(--mu);border:1px solid var(--b)}
+.mode-card.active .mc-tag{background:rgba(124,92,252,.15);color:var(--ac2);border-color:rgba(124,92,252,.3)}
+.active-check{position:absolute;top:12px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--ac);display:none;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700}
+.mode-card.active .active-check{display:flex}
+
+/* ═══ FORM PANELS ═══ */
+.form-panel{display:none}
+.form-panel.on{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+
+/* Card base */
+.card{background:var(--bg2);border:1px solid var(--b);border-radius:20px;padding:24px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.card.manual::before{background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.card.github::before{background:linear-gradient(90deg,#24292e,#8b949e,var(--bl))}
+.card.resume::before{background:linear-gradient(90deg,var(--gn),#059669)}
+.ctitle{font-size:14px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+
+/* Form fields */
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--mu2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:10px;padding:9px 12px;color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .2s;resize:vertical}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--ac)}
+.fg select option{background:var(--bg3)}
+
+/* Skill tags */
+.stags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.sk{padding:5px 11px;border-radius:100px;font-size:12px;font-weight:500;border:1px solid var(--b2);background:var(--bg3);color:var(--mu);cursor:pointer;transition:all .18s;user-select:none}
+.sk:hover{border-color:var(--ac);color:var(--ac2)}
+.sk.on{background:rgba(124,92,252,.18);border-color:var(--ac);color:var(--ac2)}
+.custom-row{display:flex;gap:7px;margin-top:6px}
+.custom-row input{flex:1}
+.addbtn{background:var(--ac);border:none;color:#fff;padding:9px 13px;border-radius:9px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Space Grotesk',sans-serif;white-space:nowrap;transition:opacity .2s}
+.addbtn:hover{opacity:.85}
+
+/* Sliders */
+.slr{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.slr label{font-size:12px;color:var(--mu);min-width:148px}
+.slr input[type=range]{flex:1;accent-color:var(--ac);cursor:pointer}
+.slr .sv{font-size:12px;font-weight:700;color:var(--ac2);min-width:22px;text-align:right}
+
+/* Project mini-form */
+.proj-list{display:flex;flex-direction:column;gap:7px;margin-bottom:9px}
+.proj-card{background:var(--bg3);border:1px solid var(--b);border-radius:10px;padding:10px 12px;position:relative}
+.proj-card h5{font-size:13px;font-weight:600;margin-bottom:2px}
+.proj-card p{font-size:11px;color:var(--mu)}
+.pdel{position:absolute;top:8px;right:9px;background:none;border:none;color:var(--mu2);cursor:pointer;font-size:12px}
+.pdel:hover{color:var(--rd)}
+.proj-form{background:var(--bg3);border:1px solid var(--b2);border-radius:11px;padding:12px}
+.pr2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Checkboxes */
+.ckgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px}
+.ck{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mu);cursor:pointer;padding:3px 0}
+.ck input{accent-color:var(--ac);width:13px;height:13px}
+.ck:hover{color:var(--tx)}
+
+/* GitHub panel specific */
+.gh-input-row{display:flex;gap:8px;margin-bottom:10px}
+.gh-input-row input{flex:1}
+.gh-fetch-btn{background:var(--bg3);border:1px solid rgba(100,100,120,.5);color:var(--tx);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:6px}
+.gh-fetch-btn:hover{border-color:var(--b2);background:var(--bg4)}
+.gh-fetch-btn:disabled{opacity:.4;cursor:not-allowed}
+.gh-err{font-size:12px;color:var(--rd);margin-top:5px;display:none}
+
+/* Live GitHub profile card */
+.gh-profile{display:none;background:var(--bg3);border:1px solid rgba(100,100,160,.3);border-radius:14px;padding:16px;margin-bottom:12px;animation:up .4s ease}
+.gh-profile.show{display:block}
+.gh-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.gh-av{width:52px;height:52px;border-radius:50%;border:2px solid rgba(124,92,252,.35)}
+.gh-meta h4{font-size:15px;font-weight:700}
+.gh-meta p{font-size:12px;color:var(--mu);margin-top:2px}
+.gh-meta a{font-size:11px;color:var(--bl);text-decoration:none}
+.gh-meta a:hover{text-decoration:underline}
+.gh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.gh-st{background:var(--bg4);border-radius:9px;padding:8px 6px;text-align:center}
+.gh-st .n{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ac2)}
+.gh-st .l{font-size:10px;color:var(--mu)}
+.lang-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.lp{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px;background:rgba(124,92,252,.14);color:var(--ac2);border:1px solid rgba(124,92,252,.22)}
+.gh-score-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);border-radius:10px}
+.gh-score-bar span{font-size:12px;color:var(--mu)}
+.gh-score-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--ac2)}
+
+/* Resume panel specific */
+.res-tabs{display:flex;gap:6px;margin-bottom:12px}
+.rtab{padding:6px 14px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--b2);background:transparent;color:var(--mu);cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+.rtab.on{background:rgba(34,211,160,.12);border-color:var(--gn);color:var(--gn)}
+.drop-area{border:2px dashed var(--b2);border-radius:14px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:10px}
+.drop-area:hover,.drop-area.drag{border-color:var(--gn);background:rgba(34,211,160,.04)}
+.drop-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:36px;margin-bottom:8px;display:block;opacity:.5}
+.drop-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.drop-sub{font-size:11px;color:var(--mu)}
+.file-loaded{display:none;align-items:center;gap:8px;background:rgba(34,211,160,.08);border:1px solid rgba(34,211,160,.25);border-radius:9px;padding:9px 12px;font-size:12px;color:var(--gn);margin-bottom:10px}
+.file-loaded.show{display:flex}
+.paste-area{display:none}
+.paste-area.on{display:block}
+.upload-area{display:none}
+.upload-area.on{display:block}
+
+/* SUBMIT */
+.submbtn{width:100%;background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;color:#fff;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:opacity .2s,transform .2s;margin-top:10px}
+.submbtn:hover{opacity:.9;transform:translateY(-1px)}
+.submbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.submbtn.green{background:linear-gradient(135deg,#059669,var(--gn))}
+.submbtn.dark{background:linear-gradient(135deg,#24292e,#4a5568)}
+
+.apibar{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:var(--mu2)}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.adot.ok{background:var(--gn)}.adot.err{background:var(--rd)}.adot.wait{background:var(--am)}
+
+/* ═══ RESULT PANEL ═══ */
+.result-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:520px;text-align:center;gap:12px;color:var(--mu)}
+.ph-ico{font-size:54px;opacity:.25}
+.result-content{display:none}
+
+/* Score ring */
+.ring-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:16px}
+.rsvg{transform:rotate(-90deg)}
+.rt{fill:none;stroke:var(--bg3);stroke-width:16}
+.rf{fill:none;stroke-width:16;stroke-linecap:round;transition:stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1)}
+.sc{margin-top:-172px;text-align:center;position:relative;z-index:2;pointer-events:none;padding-bottom:6px}
+.sc-n{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1}
+.sc-l{font-size:11px;color:var(--mu);margin-top:2px}
+.sc-b{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;padding:4px 14px;border-radius:100px;letter-spacing:.5px}
+.sc-nm{font-size:11px;color:var(--mu);margin-top:3px;text-align:center}
+.sc-msg{font-size:12px;color:var(--mu);text-align:center;margin-top:6px;padding:0 4px;line-height:1.6;font-style:italic}
+
+/* Breakdown bars */
+.brs h4{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mu2);text-transform:uppercase;margin-bottom:10px}
+.br{margin-bottom:9px}
+.brtop{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.brtop span:first-child{font-weight:500;display:flex;align-items:center;gap:5px}
+.brtop .pct{color:var(--mu);font-size:11px}
+.barbg{height:5px;background:var(--bg3);border-radius:100px;overflow:hidden}
+.barfill{height:100%;border-radius:100px;transition:width 1.4s cubic-bezier(.4,0,.2,1);width:0%}
+
+/* GitHub result box */
+.gh-res{background:var(--bg3);border:1px solid rgba(100,100,160,.25);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.gh-res h5{font-size:10px;font-weight:700;color:var(--mu2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.mini-g{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.mst .n{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--ac2)}
+.mst .l{font-size:10px;color:var(--mu)}
+
+/* Resume result box */
+.res-res{background:var(--bg3);border:1px solid rgba(34,211,160,.18);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.res-res h5{font-size:10px;font-weight:700;color:var(--mu2);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.role-bar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.role-bg{flex:1;height:6px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.role-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#059669,var(--gn));transition:width 1.4s ease}
+.role-pct{font-size:13px;font-weight:700;color:var(--gn)}
+
+/* Skill chips */
+.chips-sec{margin-bottom:12px}
+.chips-sec h5{font-size:10px;font-weight:700;color:var(--mu2);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip-ok{font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(34,211,160,.1);color:var(--gn);border:1px solid rgba(34,211,160,.22)}
+.chip-gap{font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(248,113,113,.1);color:var(--rd);border:1px solid rgba(248,113,113,.22)}
+
+/* Roadmap */
+.roadmap h4{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mu2);text-transform:uppercase;margin-bottom:8px}
+.ri{display:flex;gap:10px;margin-bottom:8px;padding:10px 12px;background:var(--bg3);border-radius:10px;border:1px solid var(--b)}
+.ri-ico{font-size:14px;flex-shrink:0;margin-top:2px}
+.ri-tx{font-size:12px;color:var(--mu);line-height:1.5}
+.ri-tx strong{color:var(--tx);display:block;margin-bottom:1px;font-size:12px}
+
+/* HOW */
+.how-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.hc{background:var(--bg2);border:1px solid var(--b);border-radius:18px;padding:26px 20px;text-align:center;transition:all .25s;position:relative;overflow:hidden}
+.hc:hover{border-color:var(--b2);transform:translateY(-4px)}
+.hc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .25s}
+.hc:hover::before{opacity:1}
+.hc-manual::before{background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.hc-github::before{background:linear-gradient(90deg,#24292e,var(--bl))}
+.hc-resume::before{background:linear-gradient(90deg,var(--gn),#059669)}
+.hc-ico{font-size:34px;margin-bottom:12px}
+.hc-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.hc-desc{font-size:13px;color:var(--mu);line-height:1.7}
+.hc-items{margin-top:12px;text-align:left;display:flex;flex-direction:column;gap:5px}
+.hc-item{font-size:12px;color:var(--mu);display:flex;align-items:flex-start;gap:6px}
+.hc-item::before{content:'→';color:var(--ac2);flex-shrink:0}
+
+/* LEADERBOARD */
+.lb-wrap{margin-top:36px;overflow-x:auto}
+.lbt{width:100%;border-collapse:collapse;min-width:560px}
+.lbt th{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mu2);text-transform:uppercase;padding:0 13px 11px;text-align:left;border-bottom:1px solid var(--b)}
+.lbt td{padding:11px 13px;border-bottom:1px solid var(--b);font-size:13px;vertical-align:middle}
+.lbt tr:hover td{background:var(--bg2)}
+.lb-sc{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
+.lb-bd{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px}
+.lb-mode{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px}
+.lb-mode.manual{background:rgba(124,92,252,.15);color:var(--ac2)}
+.lb-mode.github{background:rgba(96,165,250,.12);color:var(--bl)}
+.lb-mode.resume{background:rgba(34,211,160,.12);color:var(--gn)}
+.ref-btn{background:var(--bg2);border:1px solid var(--b2);color:var(--mu);padding:7px 14px;border-radius:100px;font-size:12px;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif;margin-top:14px}
+.ref-btn:hover{color:var(--tx);border-color:var(--b)}
+
+/* TEAM */
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+.tc{background:var(--bg2);border:1px solid var(--b);border-radius:18px;padding:28px 18px;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.tc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .3s}
+.tc:hover{border-color:var(--b2);transform:translateY(-5px)}
+.tc:hover::after{opacity:1}
+.ta::after{background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.td::after{background:linear-gradient(90deg,#059669,var(--gn))}
+.tn::after{background:linear-gradient(90deg,#d97706,var(--am))}
+.av{width:66px;height:66px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff}
+.tc h4{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:2px;letter-spacing:-.4px}
+.tc-role{font-size:12px;color:var(--mu);margin-bottom:9px}
+.tc-sk{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:9px}
+.tsk{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px}
+.tc-desc{font-size:12px;color:var(--mu);line-height:1.6}
+.tc-b{display:inline-block;margin-top:9px;font-size:10px;font-weight:700;padding:3px 11px;border-radius:100px;letter-spacing:1px;text-transform:uppercase}
+
+/* CTA */
+.cta-wrap{max-width:1200px;margin:0 auto 56px;padding:0 48px}
+.cta-in{background:linear-gradient(135deg,rgba(124,92,252,.16),rgba(192,132,252,.06));border:1px solid rgba(124,92,252,.27);border-radius:24px;padding:56px 44px;text-align:center}
+.cta-in h2{font-family:'Syne',sans-serif;font-size:clamp(22px,3.2vw,38px);font-weight:800;letter-spacing:-1px;margin-bottom:10px}
+.cta-in p{color:var(--mu);font-size:14px;margin-bottom:24px}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--bg2);border:1px solid var(--b2);border-radius:12px;padding:11px 16px;font-size:12px;z-index:999;display:none;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.ok{border-color:rgba(34,211,160,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .5s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+
+footer{border-top:1px solid var(--b);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;max-width:1200px;margin:0 auto;font-size:12px;color:var(--mu)}
+
+@media(max-width:900px){
+  .mode-cards{grid-template-columns:1fr}
+  .form-panel.on{grid-template-columns:1fr}
+  .how-3{grid-template-columns:1fr}
+  .tg{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  nav{padding:12px 18px}.nav-links{display:none}
+  .hero{padding:94px 18px 56px}
+  .statsbar{gap:24px;padding:20px 18px}
+  .wrap{padding:52px 18px}
+  .pr2{grid-template-columns:1fr}
+  .ckgrid{grid-template-columns:1fr}
+  .cta-in{padding:36px 18px}
+  .cta-wrap{padding:0 18px}
+  footer{flex-direction:column;text-align:center;padding:20px 18px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="go('top')">Intern<em>IQ</em></div>
+  <div class="nav-links">
+    <a onclick="go('engine')">Score Engine</a>
+    <a onclick="go('how')">How it works</a>
+    <a onclick="go('leaderboard')">Leaderboard</a>
+    <a onclick="go('team')">Team</a>
+  </div>
+  <button class="nav-cta" onclick="go('engine')">Get my score</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <div class="hbadge"><span class="dot"></span> AI-Powered · 3 Analysis Methods · EdTech</div>
+  <h1>Your <span class="grad">internship readiness</span> score — 3 ways to analyze</h1>
+  <p class="hsub">Choose how you want to be analyzed. Enter manually, connect your GitHub, or upload your resume. Each gives you a precise readiness score with a personalized roadmap.</p>
+  <div class="hbtns">
+    <button class="btn-p" onclick="go('engine')">Choose my analysis method →</button>
+    <button class="btn-o" onclick="go('how')">See how it works</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="statsbar">
+  <div class="stat"><div class="stn" id="s-total">—</div><div class="stl">Profiles analyzed</div></div>
+  <div class="stat"><div class="stn" id="s-avg">—</div><div class="stl">Average score</div></div>
+  <div class="stat"><div class="stn" id="s-top">—</div><div class="stl">Top score achieved</div></div>
+  <div class="stat"><div class="stn">3</div><div class="stl">Analysis methods</div></div>
+</div>
+
+<!-- ═══ ENGINE SECTION ═══ -->
+<div class="wrap" id="engine">
+  <div class="stag">Score Engine</div>
+  <h2 class="stitle">How do you want to be analyzed?</h2>
+  <p class="ssub">Pick one method. Each gives you a full readiness score, skill gap report, and improvement roadmap.</p>
+
+  <div class="mode-section">
+
+    <!-- 3 MODE SELECTOR CARDS -->
+    <div class="mode-cards">
+
+      <!-- MANUAL -->
+      <div class="mode-card mc-manual" onclick="selectMode('manual',this)" id="mc-manual">
+        <div class="active-check">✓</div>
+        <span class="mc-icon">✍️</span>
+        <div class="mc-title">Manual Input</div>
+        <div class="mc-desc">Tell us your skills, projects, and coding activity. Best if you want full control over what's scored.</div>
+        <div class="mc-tags">
+          <span class="mc-tag">Skills</span>
+          <span class="mc-tag">Projects</span>
+          <span class="mc-tag">Activity</span>
+        </div>
+      </div>
+
+      <!-- GITHUB -->
+      <div class="mode-card mc-github" onclick="selectMode('github',this)" id="mc-github">
+        <div class="active-check">✓</div>
+        <span class="mc-icon">📂</span>
+        <div class="mc-title">GitHub Profile</div>
+        <div class="mc-desc">Enter your GitHub username. We fetch your repos, languages, stars, and followers live to score you.</div>
+        <div class="mc-tags">
+          <span class="mc-tag">Live API fetch</span>
+          <span class="mc-tag">Repos</span>
+          <span class="mc-tag">Languages</span>
+        </div>
+      </div>
+
+      <!-- RESUME -->
+      <div class="mode-card mc-resume" onclick="selectMode('resume',this)" id="mc-resume">
+        <div class="active-check">✓</div>
+        <span class="mc-icon">📄</span>
+        <div class="mc-title">Resume Upload</div>
+        <div class="mc-desc">Upload your resume or paste the text. AI scans 50+ tech keywords and measures role alignment.</div>
+        <div class="mc-tags">
+          <span class="mc-tag">Upload .txt/.pdf</span>
+          <span class="mc-tag">AI keyword scan</span>
+        </div>
+      </div>
+
+    </div><!-- end mode-cards -->
+
+    <!-- ── COMMON FIELDS (always shown) ── -->
+    <div id="commonFields" style="display:none;margin-bottom:18px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+        <div class="fg"><label>Your name *</label><input id="f-name" placeholder="e.g. Akshanth"></div>
+        <div class="fg"><label>Target role *</label>
+          <select id="f-role">
+            <option value="">Select role</option>
+            <option value="swe">Software Engineering</option>
+            <option value="ml">Machine Learning / AI</option>
+            <option value="data">Data Science / Analytics</option>
+            <option value="web">Web Development</option>
+            <option value="product">Product Management</option>
+            <option value="design">UI/UX Design</option>
+          </select>
+        </div>
+        <div class="fg"><label>Year of study</label>
+          <select id="f-year">
+            <option value="1">1st Year</option><option value="2">2nd Year</option>
+            <option value="3">3rd Year</option><option value="4">Final Year</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: MANUAL ══ -->
+    <div class="form-panel" id="panel-manual">
+
+      <!-- LEFT: form -->
+      <div class="card manual">
+        <div class="ctitle">✍️ Skills, Projects &amp; Activity</div>
+
+        <div class="fg">
+          <label>Skills you know</label>
+          <div class="stags" id="skillTags">
+            <span class="sk" onclick="tsk(this,'Python')">Python</span>
+            <span class="sk" onclick="tsk(this,'Java')">Java</span>
+            <span class="sk" onclick="tsk(this,'JavaScript')">JavaScript</span>
+            <span class="sk" onclick="tsk(this,'TypeScript')">TypeScript</span>
+            <span class="sk" onclick="tsk(this,'C++')">C++</span>
+            <span class="sk" onclick="tsk(this,'React')">React</span>
+            <span class="sk" onclick="tsk(this,'Node.js')">Node.js</span>
+            <span class="sk" onclick="tsk(this,'SQL')">SQL</span>
+            <span class="sk" onclick="tsk(this,'Machine Learning')">Machine Learning</span>
+            <span class="sk" onclick="tsk(this,'Deep Learning')">Deep Learning</span>
+            <span class="sk" onclick="tsk(this,'TensorFlow')">TensorFlow</span>
+            <span class="sk" onclick="tsk(this,'PyTorch')">PyTorch</span>
+            <span class="sk" onclick="tsk(this,'Pandas')">Pandas</span>
+            <span class="sk" onclick="tsk(this,'NumPy')">NumPy</span>
+            <span class="sk" onclick="tsk(this,'Git / GitHub')">Git / GitHub</span>
+            <span class="sk" onclick="tsk(this,'DSA')">DSA</span>
+            <span class="sk" onclick="tsk(this,'REST APIs')">REST APIs</span>
+            <span class="sk" onclick="tsk(this,'Docker')">Docker</span>
+            <span class="sk" onclick="tsk(this,'AWS')">AWS</span>
+            <span class="sk" onclick="tsk(this,'Django')">Django</span>
+            <span class="sk" onclick="tsk(this,'Flask')">Flask</span>
+            <span class="sk" onclick="tsk(this,'System Design')">System Design</span>
+          </div>
+          <div class="custom-row">
+            <input id="csk" placeholder="Add custom skill…" onkeydown="if(event.key==='Enter')addCsk()">
+            <button class="addbtn" onclick="addCsk()">+ Add</button>
+          </div>
+        </div>
+
+        <div class="fg" style="margin-top:14px">
+          <label>Projects</label>
+          <div class="proj-list" id="projList"></div>
+          <div class="proj-form">
+            <div class="fg"><label>Title</label><input id="pt" placeholder="e.g. AI Resume Scanner"></div>
+            <div class="fg"><label>Description</label><textarea id="pd" style="min-height:60px" placeholder="What it does, tech used, impact..."></textarea></div>
+            <div class="fg"><label>Tech stack (comma separated)</label><input id="ptk" placeholder="Python, Flask, React, PostgreSQL"></div>
+            <div class="pr2">
+              <div class="fg"><label>Team size</label>
+                <select id="pts"><option value="1">Solo</option><option value="2">2 people</option><option value="3">3–4 people</option><option value="5">5+</option></select></div>
+              <div class="fg"><label>Duration</label>
+                <select id="ptd"><option value="1">&lt;1 month</option><option value="2">1–2 months</option><option value="4">3–4 months</option><option value="6">5+ months</option></select></div>
+            </div>
+            <button class="addbtn" style="width:100%;border-radius:9px;padding:9px" onclick="addProj()">+ Add project</button>
+          </div>
+        </div>
+
+        <div class="fg" style="margin-top:14px">
+          <label>Coding activity</label>
+          <div class="slr"><label>Hours coding / week</label><input type="range" id="sl-hrs" min="0" max="40" value="10" step="1" oninput="sv('hrs',this.value)"><span class="sv" id="vhrs">10</span></div>
+          <div class="slr"><label>Practice frequency (1–5)</label><input type="range" id="sl-freq" min="1" max="5" value="3" oninput="sv('freq',this.value)"><span class="sv" id="vfreq">3</span></div>
+          <div class="slr"><label>LeetCode solved</label><input type="range" id="sl-leet" min="0" max="300" value="20" step="5" oninput="sv('leet',this.value)"><span class="sv" id="vleet">20</span></div>
+          <div class="slr"><label>Hackathons</label><input type="range" id="sl-hack" min="0" max="5" value="0" oninput="sv('hack',this.value)"><span class="sv" id="vhack">0</span></div>
+          <div class="slr"><label>Open source contributions</label><input type="range" id="sl-oss" min="0" max="10" value="0" oninput="sv('oss',this.value)"><span class="sv" id="voss">0</span></div>
+          <div class="fg" style="margin-top:4px"><label>Platforms</label>
+            <div class="ckgrid">
+              <label class="ck"><input type="checkbox" class="platcb" value="LeetCode"> LeetCode</label>
+              <label class="ck"><input type="checkbox" class="platcb" value="HackerRank"> HackerRank</label>
+              <label class="ck"><input type="checkbox" class="platcb" value="Codeforces"> Codeforces</label>
+              <label class="ck"><input type="checkbox" class="platcb" value="Kaggle"> Kaggle</label>
+            </div>
+          </div>
+        </div>
+        <button class="submbtn" id="subBtn-manual" onclick="submitMode('manual')">✍️ Calculate my readiness score</button>
+        <div class="apibar"><span class="adot wait" id="adot"></span><span id="atxt">Connecting…</span></div>
+      </div>
+
+      <!-- RIGHT: result -->
+      <div class="card manual" id="resultCard-manual">
+        <div class="result-ph" id="ph-manual">
+          <div class="ph-ico">✍️</div>
+          <p style="font-size:13px;max-width:190px;color:var(--mu);line-height:1.6">Fill in your skills, projects, and activity then click Calculate.</p>
+        </div>
+        <div class="result-content" id="rc-manual"></div>
+      </div>
+    </div><!-- end panel-manual -->
+
+    <!-- ══ PANEL: GITHUB ══ -->
+    <div class="form-panel" id="panel-github">
+
+      <!-- LEFT: github input -->
+      <div class="card github">
+        <div class="ctitle">📂 GitHub Profile Analysis</div>
+        <p style="font-size:12px;color:var(--mu);margin-bottom:14px;line-height:1.6">Enter your GitHub username. We call the live GitHub API to fetch your repositories, languages, stars, followers, and project descriptions — then score your profile.</p>
+
+        <div class="fg">
+          <label>GitHub username</label>
+          <div class="gh-input-row">
+            <input id="f-github" placeholder="e.g. akshanth  (no @ sign)">
+            <button class="gh-fetch-btn" id="ghBtn" onclick="fetchGitHub()">
+              📂 Fetch profile
+            </button>
+          </div>
+          <div class="gh-err" id="ghErr">User not found. Check your username and try again.</div>
+        </div>
+
+        <!-- Live profile card (shown after fetch) -->
+        <div class="gh-profile" id="ghProfile">
+          <div class="gh-head">
+            <img class="gh-av" id="gh-av" src="" alt="">
+            <div class="gh-meta">
+              <h4 id="gh-name">—</h4>
+              <p id="gh-bio">—</p>
+              <a id="gh-link" href="#" target="_blank">View on GitHub ↗</a>
+            </div>
+          </div>
+          <div class="gh-grid">
+            <div class="gh-st"><div class="n" id="gh-repos">0</div><div class="l">Public repos</div></div>
+            <div class="gh-st"><div class="n" id="gh-stars">0</div><div class="l">Total stars</div></div>
+            <div class="gh-st"><div class="n" id="gh-followers">0</div><div class="l">Followers</div></div>
+            <div class="gh-st"><div class="n" id="gh-langs-n">0</div><div class="l">Languages</div></div>
+          </div>
+          <div class="lang-row" id="gh-langs"></div>
+          <div class="gh-score-bar">
+            <span>Estimated GitHub score</span>
+            <span class="gh-score-val" id="gh-score">—</span>
+          </div>
+        </div>
+
+        <button class="submbtn dark" style="margin-top:14px" id="subBtn-github" onclick="submitMode('github')" disabled>📂 Get my GitHub score</button>
+        <div style="margin-top:8px;font-size:11px;color:var(--mu2)">Fetch your profile first to enable scoring.</div>
+      </div>
+
+      <!-- RIGHT: result -->
+      <div class="card github" id="resultCard-github">
+        <div class="result-ph" id="ph-github">
+          <div class="ph-ico">📂</div>
+          <p style="font-size:13px;max-width:190px;color:var(--mu);line-height:1.6">Enter your GitHub username and click Fetch to analyze your profile.</p>
+        </div>
+        <div class="result-content" id="rc-github"></div>
+      </div>
+    </div><!-- end panel-github -->
+
+    <!-- ══ PANEL: RESUME ══ -->
+    <div class="form-panel" id="panel-resume">
+
+      <!-- LEFT: resume input -->
+      <div class="card resume">
+        <div class="ctitle">📄 Resume AI Analysis</div>
+        <p style="font-size:12px;color:var(--mu);margin-bottom:14px;line-height:1.6">Upload your resume file or paste the text. Our AI scans for 50+ technical keywords, measures how well your resume aligns to your target role, and identifies missing skills.</p>
+
+        <div class="res-tabs">
+          <button class="rtab on" onclick="switchRes('upload',this)">📎 Upload file</button>
+          <button class="rtab" onclick="switchRes('paste',this)">📋 Paste text</button>
+        </div>
+
+        <!-- Upload -->
+        <div class="upload-area on" id="uploadArea">
+          <div class="file-loaded" id="fileLoaded">
+            <span>📄</span><span id="fileName">—</span><span style="margin-left:auto;color:var(--gn)">✓ Loaded</span>
+          </div>
+          <div class="drop-area" id="dropArea"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="handleDrop(event)">
+            <input type="file" id="resumeFile" accept=".txt,.pdf,.doc,.docx" onchange="handleFile(this)">
+            <span class="drop-icon">📄</span>
+            <div class="drop-title">Drop your resume here or click to browse</div>
+            <div class="drop-sub">Supports .txt files — PDF text will be extracted automatically</div>
+          </div>
+        </div>
+
+        <!-- Paste -->
+        <div class="paste-area" id="pasteArea">
+          <div class="fg">
+            <label>Paste resume text</label>
+            <textarea id="f-resume" style="min-height:180px" placeholder="Paste your full resume here — skills, work experience, projects, education, certifications..."></textarea>
+          </div>
+        </div>
+
+        <div id="wc-info" style="font-size:11px;color:var(--mu2);margin-bottom:8px;display:none"></div>
+
+        <button class="submbtn green" id="subBtn-resume" onclick="submitMode('resume')">📄 Analyze my resume</button>
+      </div>
+
+      <!-- RIGHT: result -->
+      <div class="card resume" id="resultCard-resume">
+        <div class="result-ph" id="ph-resume">
+          <div class="ph-ico">📄</div>
+          <p style="font-size:13px;max-width:190px;color:var(--mu);line-height:1.6">Upload or paste your resume then click Analyze to get your AI-powered score.</p>
+        </div>
+        <div class="result-content" id="rc-resume"></div>
+      </div>
+    </div><!-- end panel-resume -->
+
+  </div><!-- end mode-section -->
+</div>
+
+<div class="div"></div>
+
+<!-- HOW IT WORKS -->
+<div class="wrap" id="how">
+  <div class="stag">How it works</div>
+  <h2 class="stitle">3 ways to get your score</h2>
+  <p class="ssub">Each method analyzes different signals and gives you a readiness score with a personalized improvement roadmap.</p>
+  <div class="how-3">
+    <div class="hc hc-manual">
+      <div class="hc-ico">✍️</div>
+      <div class="hc-title">Manual Input</div>
+      <div class="hc-desc">Best for complete control. You tell us exactly what you know and have built.</div>
+      <div class="hc-items">
+        <div class="hc-item">Select your technical skills from 20+ options</div>
+        <div class="hc-item">Add your projects with descriptions and tech stack</div>
+        <div class="hc-item">Rate your coding activity — LeetCode, hackathons, hours per week</div>
+        <div class="hc-item">Get skill gap report vs your target role requirements</div>
+      </div>
+    </div>
+    <div class="hc hc-github">
+      <div class="hc-ico">📂</div>
+      <div class="hc-title">GitHub Profile</div>
+      <div class="hc-desc">Best for developers with public repos. We read your real GitHub data.</div>
+      <div class="hc-items">
+        <div class="hc-item">Live fetch from GitHub API — no sign-in needed</div>
+        <div class="hc-item">Scores repos, languages, stars, followers, README quality</div>
+        <div class="hc-item">Detects which role-required languages you already use</div>
+        <div class="hc-item">Shows missing skills based on your language profile</div>
+      </div>
+    </div>
+    <div class="hc hc-resume">
+      <div class="hc-ico">📄</div>
+      <div class="hc-title">Resume Upload</div>
+      <div class="hc-desc">Best for job seekers. We analyze how well your resume is optimized.</div>
+      <div class="hc-items">
+        <div class="hc-item">Upload .txt/.pdf or paste resume text directly</div>
+        <div class="hc-item">AI scans 50+ technical keywords automatically</div>
+        <div class="hc-item">Measures role alignment score against target JD requirements</div>
+        <div class="hc-item">Highlights missing keywords you should add</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- LEADERBOARD -->
+<div class="wrap" id="leaderboard">
+  <div class="stag">Leaderboard</div>
+  <h2 class="stitle">Top readiness scores</h2>
+  <p class="ssub">Live from the database — see how you compare across all 3 analysis methods.</p>
+  <button class="ref-btn" onclick="loadLB()">↻ Refresh</button>
+  <div class="lb-wrap">
+    <table class="lbt">
+      <thead><tr>
+        <th style="width:46px">Rank</th>
+        <th>Name</th>
+        <th>Method</th>
+        <th>Role</th>
+        <th>Badge</th>
+        <th>Score</th>
+        <th>Date</th>
+      </tr></thead>
+      <tbody id="lb-body"><tr><td colspan="7" style="padding:36px;text-align:center;color:var(--mu2);font-size:13px">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- TEAM -->
+<div class="wrap" id="team">
+  <div class="stag">Our team</div>
+  <h2 class="stitle">Built by students, for students</h2>
+  <p class="ssub">Three people who built this to solve a real problem they faced themselves.</p>
+  <div class="tg">
+    <div class="tc ta">
+      <div class="av" style="background:linear-gradient(135deg,#7c5cfc,#c084fc)">A</div>
+      <h4>Akshanth</h4><div class="tc-role">AI &amp; ML Engineer</div>
+      <div class="tc-sk">
+        <span class="tsk" style="background:rgba(124,92,252,.2);color:#c084fc">Score engine</span>
+        <span class="tsk" style="background:rgba(124,92,252,.2);color:#c084fc">Python</span>
+        <span class="tsk" style="background:rgba(124,92,252,.2);color:#c084fc">NLP</span>
+      </div>
+      <p class="tc-desc">Built all 3 scoring engines — manual skill model, GitHub profile analyzer, and the resume NLP keyword extractor and role alignment scorer.</p>
+      <span class="tc-b" style="background:rgba(124,92,252,.2);color:#c084fc">Team Lead</span>
+    </div>
+    <div class="tc td">
+      <div class="av" style="background:linear-gradient(135deg,#059669,#22d3a0)">D</div>
+      <h4>Durga</h4><div class="tc-role">Full Stack Developer</div>
+      <div class="tc-sk">
+        <span class="tsk" style="background:rgba(34,211,160,.2);color:#22d3a0">Frontend</span>
+        <span class="tsk" style="background:rgba(34,211,160,.2);color:#22d3a0">Python server</span>
+        <span class="tsk" style="background:rgba(34,211,160,.2);color:#22d3a0">SQLite</span>
+      </div>
+      <p class="tc-desc">Built the full-stack architecture — Python HTTP server, SQLite database, REST API, and the 3-mode interactive frontend with live GitHub integration.</p>
+      <span class="tc-b" style="background:rgba(34,211,160,.2);color:#22d3a0">Developer</span>
+    </div>
+    <div class="tc tn">
+      <div class="av" style="background:linear-gradient(135deg,#d97706,#f59e0b)">N</div>
+      <h4>Narmatha</h4><div class="tc-role">Data Analyst &amp; Designer</div>
+      <div class="tc-sk">
+        <span class="tsk" style="background:rgba(245,158,11,.2);color:#f59e0b">Benchmarks</span>
+        <span class="tsk" style="background:rgba(245,158,11,.2);color:#f59e0b">UX Design</span>
+        <span class="tsk" style="background:rgba(245,158,11,.2);color:#f59e0b">Research</span>
+      </div>
+      <p class="tc-desc">Led skill benchmark research, curated the keyword scoring dataset, validated scoring accuracy, and designed the entire user experience.</p>
+      <span class="tc-b" style="background:rgba(245,158,11,.2);color:#f59e0b">Analyst &amp; Design</span>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-wrap">
+  <div class="cta-in">
+    <h2>Ready to find out your score?</h2>
+    <p>Choose a method and get your AI-powered readiness score in under 2 minutes.</p>
+    <button class="btn-p" style="font-size:15px;padding:13px 36px" onclick="go('engine')">Choose my method →</button>
+  </div>
+</div>
+
+<footer>
+  <div><strong style="color:#f0eff8">Intern<em style="color:#7c5cfc;font-style:normal">IQ</em></strong> — AI Internship Readiness Score Engine</div>
+  <div>Akshanth &nbsp;·&nbsp; Durga &nbsp;·&nbsp; Narmatha</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentMode = null;
+let githubData  = null;
+let resumeText  = '';
+const selectedSkills = new Set();
+const projects = [];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function go(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}) }
+function sv(k,v){ document.getElementById('v'+k).textContent=v }
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast '+type;
+  el.style.display='block'; setTimeout(()=>el.style.display='none',3500);
+}
+
+// ── Mode selection ────────────────────────────────────────────────────────────
+function selectMode(mode, card){
+  currentMode = mode;
+  // Update cards
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('active'));
+  card.classList.add('active');
+  // Show common fields
+  document.getElementById('commonFields').style.display='block';
+  // Show correct panel
+  document.querySelectorAll('.form-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-'+mode).classList.add('on');
+  // Scroll to form
+  setTimeout(()=>document.getElementById('commonFields').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+// ── Skills (manual mode) ──────────────────────────────────────────────────────
+function tsk(el,name){
+  if(selectedSkills.has(name)){selectedSkills.delete(name);el.classList.remove('on')}
+  else{selectedSkills.add(name);el.classList.add('on')}
+}
+function addCsk(){
+  const inp=document.getElementById('csk'), name=inp.value.trim();
+  if(!name) return;
+  const t=document.createElement('span');
+  t.className='sk on'; t.textContent=name; t.onclick=()=>tsk(t,name);
+  document.getElementById('skillTags').appendChild(t);
+  selectedSkills.add(name); inp.value='';
+}
+
+// ── Projects ──────────────────────────────────────────────────────────────────
+function addProj(){
+  const title=document.getElementById('pt').value.trim();
+  if(!title){toast('Enter a project title','err');return}
+  projects.push({
+    title,
+    description:document.getElementById('pd').value.trim(),
+    techStack:document.getElementById('ptk').value.split(',').map(s=>s.trim()).filter(Boolean),
+    teamSize:document.getElementById('pts').value,
+    duration:document.getElementById('ptd').value,
+  });
+  renderProj();
+  ['pt','pd','ptk'].forEach(id=>document.getElementById(id).value='');
+}
+function removeProj(i){projects.splice(i,1);renderProj()}
+function renderProj(){
+  document.getElementById('projList').innerHTML=projects.map((p,i)=>`
+    <div class="proj-card">
+      <button class="pdel" onclick="removeProj(${i})">✕</button>
+      <h5>${p.title}</h5>
+      <p>${p.techStack.slice(0,4).join(', ')||'No tech listed'}</p>
+    </div>`).join('');
+}
+
+// ── GitHub fetch ──────────────────────────────────────────────────────────────
+async function fetchGitHub(){
+  const username=document.getElementById('f-github').value.trim();
+  if(!username){toast('Enter your GitHub username','err');return}
+  const btn=document.getElementById('ghBtn');
+  const err=document.getElementById('ghErr');
+  err.style.display='none';
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin"></span> Fetching…';
+  try{
+    const [pRes,rRes]=await Promise.all([
+      fetch(`https://api.github.com/users/${username}`),
+      fetch(`https://api.github.com/users/${username}/repos?per_page=50&sort=updated`)
+    ]);
+    if(!pRes.ok) throw new Error('not found');
+    const profile=await pRes.json();
+    const repos=rRes.ok ? await rRes.json() : [];
+    const langMap={};
+    let totalStars=0, reposWithDesc=0, forksCreated=0;
+    repos.forEach(r=>{
+      if(r.fork){forksCreated++;return}
+      if(r.language) langMap[r.language]=(langMap[r.language]||0)+1;
+      totalStars+=r.stargazers_count||0;
+      if(r.description) reposWithDesc++;
+    });
+    const languages=Object.entries(langMap).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]);
+
+    // Score
+    const s=Math.min(100,Math.round(
+      Math.min(30,profile.public_repos*2)+
+      Math.min(20,languages.length*4)+
+      Math.min(15,totalStars*2)+
+      Math.min(10,profile.followers)+
+      Math.min(10,reposWithDesc*1.5)+
+      (profile.bio?5:0)+
+      Math.min(10,forksCreated*2)
+    ));
+
+    githubData={
+      score:s,available:true,username,
+      name:profile.name||username,
+      bio:profile.bio||'No bio set',
+      avatar:profile.avatar_url,
+      repos:profile.public_repos,
+      stars:totalStars,
+      followers:profile.followers,
+      following:profile.following,
+      languages,reposWithDesc,forksCreated,
+    };
+
+    // Show profile card
+    document.getElementById('gh-av').src=profile.avatar_url;
+    document.getElementById('gh-name').textContent=profile.name||username;
+    document.getElementById('gh-bio').textContent=profile.bio||'No bio set';
+    document.getElementById('gh-link').href=`https://github.com/${username}`;
+    document.getElementById('gh-link').textContent=`github.com/${username} ↗`;
+    document.getElementById('gh-repos').textContent=profile.public_repos;
+    document.getElementById('gh-stars').textContent=totalStars;
+    document.getElementById('gh-followers').textContent=profile.followers;
+    document.getElementById('gh-langs-n').textContent=languages.length;
+    document.getElementById('gh-langs').innerHTML=languages.map(l=>`<span class="lp">${l}</span>`).join('');
+    document.getElementById('gh-score').textContent=s+'/100';
+    document.getElementById('ghProfile').classList.add('show');
+    document.getElementById('subBtn-github').disabled=false;
+    document.getElementById('subBtn-github').innerHTML='📂 Get my GitHub score';
+    toast(`Profile fetched! @${username} — Score: ${s}/100 🎉`);
+  }catch(e){
+    err.style.display='block';
+    githubData=null;
+    document.getElementById('ghProfile').classList.remove('show');
+    document.getElementById('subBtn-github').disabled=true;
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='📂 Fetch profile';
+  }
+}
+
+// ── Resume ────────────────────────────────────────────────────────────────────
+function switchRes(mode,btn){
+  document.querySelectorAll('.rtab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('uploadArea').classList.toggle('on',mode==='upload');
+  document.getElementById('pasteArea').classList.toggle('on',mode==='paste');
+}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('dropArea').classList.remove('drag');
+  if(e.dataTransfer.files[0]) handleFile({files:e.dataTransfer.files});
+}
+function handleFile(inp){
+  const file=inp.files[0]; if(!file) return;
+  document.getElementById('fileName').textContent=file.name;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let text=e.target.result;
+    if(file.name.endsWith('.pdf')) text=text.replace(/[^\x20-\x7E\n\r\t]/g,' ').replace(/\s+/g,' ').trim();
+    resumeText=text;
+    const wc=text.split(/\s+/).filter(Boolean).length;
+    document.getElementById('fileLoaded').classList.add('show');
+    document.getElementById('wc-info').textContent=`✓ Extracted ~${wc} words from ${file.name}`;
+    document.getElementById('wc-info').style.display='block';
+    toast(`Resume loaded — ~${wc} words ready to analyze ✅`);
+  };
+  reader.readAsText(file);
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+async function submitMode(mode){
+  const name=document.getElementById('f-name').value.trim();
+  const role=document.getElementById('f-role').value;
+  if(!name){toast('Enter your name above','err');document.getElementById('f-name').focus();return}
+  if(!role){toast('Select your target role above','err');document.getElementById('f-role').focus();return}
+
+  let payload={mode,name,targetRole:role,yearStudy:document.getElementById('f-year').value};
+
+  if(mode==='manual'){
+    payload.skills=[...selectedSkills];
+    payload.projects=projects;
+    payload.activity={
+      hoursPerWeek:document.getElementById('sl-hrs').value,
+      practiceFrequency:document.getElementById('sl-freq').value,
+      leetcodeSolved:document.getElementById('sl-leet').value,
+      hackathons:document.getElementById('sl-hack').value,
+      openSource:document.getElementById('sl-oss').value,
+      platforms:[...document.querySelectorAll('.platcb:checked')].map(c=>c.value),
+    };
+  } else if(mode==='github'){
+    if(!githubData){toast('Fetch your GitHub profile first','err');return}
+    payload.githubData=githubData;
+    payload.githubUsername=document.getElementById('f-github').value.trim();
+  } else if(mode==='resume'){
+    const pasted=document.getElementById('f-resume').value.trim();
+    const finalText=resumeText||pasted;
+    if(!finalText){toast('Upload or paste your resume first','err');return}
+    payload.resumeText=finalText;
+  }
+
+  const btn=document.getElementById('subBtn-'+mode);
+  btn.disabled=true;
+  btn.innerHTML=`<span class="spin"></span>Analyzing…`;
+
+  try{
+    const res=await fetch('/api/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!res.ok) throw new Error('Server '+res.status);
+    const data=await res.json();
+    renderResult(mode, data);
+    toast('Score ready and saved to leaderboard 🎉');
+    loadLB(); checkAPI();
+  }catch(e){
+    toast('Cannot reach backend. Make sure server is running.','err');
+  }finally{
+    btn.disabled=false;
+    const labels={manual:'✍️ Calculate my readiness score',github:'📂 Get my GitHub score',resume:'📄 Analyze my resume'};
+    btn.innerHTML=labels[mode];
+  }
+}
+
+// ── Render result ─────────────────────────────────────────────────────────────
+const BS={
+  'Internship Ready':{bg:'rgba(34,211,160,.2)',col:'#22d3a0'},
+  'Strong Candidate':{bg:'rgba(124,92,252,.2)',col:'#c084fc'},
+  'Developing':{bg:'rgba(245,158,11,.2)',col:'#f59e0b'},
+  'Early Stage':{bg:'rgba(96,165,250,.2)',col:'#60a5fa'},
+  'Needs Foundation':{bg:'rgba(248,113,113,.2)',col:'#f87171'},
+};
+const RL={swe:'Software Eng.',ml:'ML / AI',data:'Data Science',web:'Web Dev',product:'Product',design:'Design'};
+const BAR_COLORS=['linear-gradient(90deg,#7c5cfc,#c084fc)','linear-gradient(90deg,#059669,#22d3a0)','linear-gradient(90deg,#db2777,#ec4899)','linear-gradient(90deg,#d97706,#f59e0b)'];
+
+function renderResult(mode, d){
+  document.getElementById('ph-'+mode).style.display='none';
+  const rc=document.getElementById('rc-'+mode);
+  rc.style.display='block';
+  const bs=BS[d.badge]||BS['Developing'];
+  const circ=2*Math.PI*70;
+
+  let html=`
+    <div class="ring-wrap">
+      <svg width="172" height="172" class="rsvg">
+        <circle class="rt" cx="86" cy="86" r="70"/>
+        <circle class="rf" id="rf-${mode}" cx="86" cy="86" r="70"
+          stroke="url(#rg-${mode})" stroke-dasharray="440" stroke-dashoffset="440"/>
+        <defs><linearGradient id="rg-${mode}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#7c5cfc"/><stop offset="100%" stop-color="#ec4899"/>
+        </linearGradient></defs>
+      </svg>
+      <div class="sc">
+        <div class="sc-n" id="sn-${mode}">0</div>
+        <div class="sc-l">/ 100 readiness score</div>
+        <div class="sc-b" style="background:${bs.bg};color:${bs.col}">${d.badge}</div>
+      </div>
+      <div class="sc-nm">${d.name} · ${RL[d.role]||d.role} track</div>
+    </div>
+    <div class="sc-msg">${d.badgeMsg||''}</div>
+    <div class="brs" style="margin-top:16px">
+      <h4>Score breakdown</h4>
+      ${(d.breakdown||[]).map((b,i)=>`
+        <div class="br">
+          <div class="brtop"><span>${b.icon} ${b.label}</span><span class="pct" id="bpct-${mode}-${i}">${b.score}%</span></div>
+          <div class="barbg"><div class="barfill" id="bf-${mode}-${i}" style="background:${BAR_COLORS[i%BAR_COLORS.length]}"></div></div>
+        </div>`).join('')}
+    </div>`;
+
+  // GitHub details
+  if(mode==='github' && d.githubData?.available){
+    const g=d.githubData;
+    html+=`<div class="gh-res">
+      <h5>GitHub profile details</h5>
+      <div class="mini-g">
+        <div class="mst"><div class="n">${g.repos}</div><div class="l">Repos</div></div>
+        <div class="mst"><div class="n">${g.stars}</div><div class="l">Stars</div></div>
+        <div class="mst"><div class="n">${g.followers}</div><div class="l">Followers</div></div>
+      </div>
+      <div class="lang-row">${(g.languages||[]).map(l=>`<span class="lp">${l}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  // Resume details
+  if(mode==='resume'){
+    html+=`<div class="res-res">
+      <h5>Resume analysis</h5>
+      <div class="role-bar">
+        <span style="font-size:12px;color:var(--mu);min-width:75px">Role match</span>
+        <div class="role-bg"><div class="role-fill" id="rmf-${mode}" style="width:0%"></div></div>
+        <span class="role-pct">${d.roleMatch||0}%</span>
+      </div>
+      <p style="font-size:11px;color:var(--mu2)">${d.wordCount||0} words analyzed in your resume</p>
+    </div>`;
+  }
+
+  // Found skills
+  if(d.topSkills?.length){
+    html+=`<div class="chips-sec">
+      <h5>Skills detected ✅</h5>
+      <div class="chips">${d.topSkills.map(s=>`<span class="chip-ok">${s}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  // Skill gaps
+  if(d.skillGaps?.length){
+    html+=`<div class="chips-sec">
+      <h5>Missing skills for your role ⚠️</h5>
+      <div class="chips">${d.skillGaps.map(g=>`<span class="chip-gap">+ ${g}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  // Roadmap
+  html+=`<div class="roadmap">
+    <h4>Your top improvement actions</h4>
+    ${(d.roadmap||[]).map(r=>`
+      <div class="ri">
+        <div class="ri-ico">${r.tip.split(' ')[0]}</div>
+        <div class="ri-tx"><strong>${r.dim} — ${r.val}%</strong>${r.tip.split(' ').slice(1).join(' ')}</div>
+      </div>`).join('')}
+  </div>`;
+
+  rc.innerHTML=html;
+
+  // Animate ring
+  setTimeout(()=>{
+    document.getElementById(`rf-${mode}`).style.strokeDashoffset = circ-(d.finalScore/100)*circ;
+    let cur=0; const step=d.finalScore/(1500/16);
+    const t=setInterval(()=>{cur=Math.min(cur+step,d.finalScore);document.getElementById(`sn-${mode}`).textContent=Math.floor(cur);if(cur>=d.finalScore)clearInterval(t)},16);
+    // Animate bars
+    (d.breakdown||[]).forEach((b,i)=>{
+      const el=document.getElementById(`bf-${mode}-${i}`);
+      if(el){el.style.width='0%';setTimeout(()=>el.style.width=b.score+'%',100)}
+    });
+    // Animate role match bar
+    const rmf=document.getElementById(`rmf-${mode}`);
+    if(rmf) setTimeout(()=>rmf.style.width=(d.roleMatch||0)+'%',100);
+  },50);
+
+  if(window.innerWidth<900) document.getElementById('resultCard-'+mode).scrollIntoView({behavior:'smooth'});
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+async function loadLB(){
+  const tb=document.getElementById('lb-body');
+  tb.innerHTML='<tr><td colspan="7" style="padding:32px;text-align:center;color:var(--mu2);font-size:13px">Loading…</td></tr>';
+  try{
+    const rows=await fetch('/api/results').then(r=>r.json());
+    if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="padding:36px;text-align:center;color:var(--mu2);font-size:13px">No entries yet — be the first 🚀</td></tr>';return}
+    tb.innerHTML=rows.map((r,i)=>{
+      const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="color:var(--mu2);font-weight:700">${i+1}</span>`;
+      const bs=BS[r.badge]||{bg:'rgba(255,255,255,.05)',col:'var(--mu)'};
+      const date=r.created_at?new Date(r.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'—';
+      const modeLabel=r.mode||'manual';
+      return `<tr>
+        <td style="font-size:17px;text-align:center">${rank}</td>
+        <td style="font-weight:600">${r.name}</td>
+        <td><span class="lb-mode ${modeLabel}">${{manual:'✍️ Manual',github:'📂 GitHub',resume:'📄 Resume'}[modeLabel]||modeLabel}</span></td>
+        <td style="font-size:12px;color:var(--mu)">${RL[r.target_role]||r.target_role||'—'}</td>
+        <td><span class="lb-bd" style="background:${bs.bg};color:${bs.col}">${r.badge}</span></td>
+        <td><span class="lb-sc" style="color:${bs.col}">${r.final_score}</span></td>
+        <td style="font-size:11px;color:var(--mu2)">${date}</td>
+      </tr>`;
+    }).join('');
+  }catch{
+    tb.innerHTML='<tr><td colspan="7" style="padding:32px;text-align:center;color:var(--rd);font-size:12px">Backend offline — run: python backend\\server.py</td></tr>';
+  }
+}
+
+// ── API check ─────────────────────────────────────────────────────────────────
+async function checkAPI(){
+  try{
+    const d=await fetch('/api/stats').then(r=>{if(!r.ok)throw 0;return r.json()});
+    document.getElementById('adot').className='adot ok';
+    document.getElementById('atxt').textContent='Backend connected · Python server running';
+    if(d.total!=null) document.getElementById('s-total').textContent=d.total;
+    if(d.avgScore)    document.getElementById('s-avg').textContent=parseFloat(d.avgScore).toFixed(1);
+    if(d.topScore)    document.getElementById('s-top').textContent=d.topScore;
+  }catch{
+    document.getElementById('adot').className='adot err';
+    document.getElementById('atxt').textContent='Backend offline — run: python backend\\server.py';
+  }
+}
+
+checkAPI();
+loadLB();
+</script>
+</body>
+</html>
